@@ -1,0 +1,37 @@
+name: Update ranking site
+
+on:
+  workflow_dispatch:
+  schedule:
+    # e-typing ranking periods appear to roll over on Tuesday.
+    # This runs every Tuesday at 10:30 JST.
+    - cron: "30 1 * * 2"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build site data
+        run: python scripts/build_site.py --period last_week --docs-dir docs --wait 0.1
+
+      - name: Commit generated site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git diff --cached --quiet || git commit -m "Update e-typing ranking site"
+          git push
