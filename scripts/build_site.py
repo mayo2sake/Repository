@@ -341,16 +341,16 @@ def render_line_svg(manifest: List[dict]) -> str:
 
 def stat_cards(stats: dict) -> str:
     items = [
-        ("参加人数", f"{stats['participant_count']:,}"),
-        ("平均", f"{stats['average']:.2f}"),
-        ("標準偏差", f"{stats['stddev']:.2f}"),
-        ("最高スコア", f"{stats['max_score']:,}"),
-        ("偏差値60", f"{stats['hensachi_60']:.2f}"),
-        ("偏差値70", f"{stats['hensachi_70']:.2f}"),
-        ("偏差値80", f"{stats['hensachi_80']:.2f}"),
-        ("偏差値90", f"{stats['hensachi_90']:.2f}"),
+        ("参加人数", f"{stats['participant_count']:,}", ""),
+        ("平均", f"{stats['average']:.2f}", ""),
+        ("標準偏差", f"{stats['stddev']:.2f}", ""),
+        ("最高スコア", f"{stats['max_score']:,}", ""),
+        ("偏差値60", f"{stats['hensachi_60']:.2f}", " stat-break"),
+        ("偏差値70", f"{stats['hensachi_70']:.2f}", ""),
+        ("偏差値80", f"{stats['hensachi_80']:.2f}", ""),
+        ("偏差値90", f"{stats['hensachi_90']:.2f}", ""),
     ]
-    return "\n".join(f"<div class=\"stat\"><span>{label}</span><strong>{value}</strong></div>" for label, value in items)
+    return "\n".join(f"<div class=\"stat{class_name}\"><span>{label}</span><strong>{value}</strong></div>" for label, value, class_name in items)
 
 
 def render_ranking_html(summary: dict, rows: List[dict], excel_name: str) -> str:
@@ -358,7 +358,6 @@ def render_ranking_html(summary: dict, rows: List[dict], excel_name: str) -> str
     distribution = build_distribution(rows)
     top_rows = rows[:20]
     distribution_svg = render_bar_svg([item["label"] for item in distribution], [item["count"] for item in distribution])
-    top_svg = render_horizontal_bar_svg([row["rank_text"] for row in top_rows], [row["score"] for row in top_rows])
     body = f"""
 <section class="hero">
   <p class="eyebrow">第{escape(summary['no'])}回</p>
@@ -366,9 +365,8 @@ def render_ranking_html(summary: dict, rows: List[dict], excel_name: str) -> str
   <div class="actions"><a class="button" href="../files/{escape(excel_name)}">Excelをダウンロード</a></div>
 </section>
 <section class="stats-grid">{stat_cards(stats)}</section>
-<section class="chart-grid">
+<section class="chart-grid single">
   <article class="panel"><h2>スコア分布</h2>{distribution_svg}</article>
-  <article class="panel"><h2>上位20件</h2>{top_svg}</article>
 </section>
 <section class="panel">
   <h2>上位一覧</h2>
@@ -462,7 +460,7 @@ h2 { margin: 0 0 16px; font-size: 18px; }
 }
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   margin: 20px 0;
 }
@@ -472,6 +470,7 @@ h2 { margin: 0 0 16px; font-size: 18px; }
   border-radius: 8px;
 }
 .stat { padding: 14px; }
+.stat-break { grid-column-start: 1; }
 .stat span { display: block; color: var(--muted); font-size: 13px; }
 .stat strong { display: block; margin-top: 6px; font-size: 24px; }
 .chart-grid {
@@ -480,6 +479,7 @@ h2 { margin: 0 0 16px; font-size: 18px; }
   gap: 16px;
   margin-bottom: 16px;
 }
+.chart-grid.single { grid-template-columns: 1fr; }
 .panel { padding: 18px; margin-bottom: 16px; }
 .chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
 .chart-svg text { fill: var(--muted); font-size: 12px; }
@@ -488,6 +488,8 @@ table { width: 100%; border-collapse: collapse; }
 th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; }
 th { color: var(--muted); font-size: 13px; }
 @media (max-width: 760px) {
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat-break { grid-column-start: auto; }
   .chart-grid { grid-template-columns: 1fr; }
   .site-header { padding: 0 16px; }
 }

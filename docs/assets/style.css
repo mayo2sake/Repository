@@ -43,7 +43,7 @@ h2 { margin: 0 0 16px; font-size: 18px; }
 }
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   margin: 20px 0;
 }
@@ -53,6 +53,7 @@ h2 { margin: 0 0 16px; font-size: 18px; }
   border-radius: 8px;
 }
 .stat { padding: 14px; }
+.stat-break { grid-column-start: 1; }
 .stat span { display: block; color: var(--muted); font-size: 13px; }
 .stat strong { display: block; margin-top: 6px; font-size: 24px; }
 .chart-grid {
@@ -61,6 +62,7 @@ h2 { margin: 0 0 16px; font-size: 18px; }
   gap: 16px;
   margin-bottom: 16px;
 }
+.chart-grid.single { grid-template-columns: 1fr; }
 .panel { padding: 18px; margin-bottom: 16px; }
 .chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
 .chart-svg text { fill: var(--muted); font-size: 12px; }
@@ -69,6 +71,8 @@ table { width: 100%; border-collapse: collapse; }
 th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; }
 th { color: var(--muted); font-size: 13px; }
 @media (max-width: 760px) {
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat-break { grid-column-start: auto; }
   .chart-grid { grid-template-columns: 1fr; }
   .site-header { padding: 0 16px; }
 }
