@@ -211,12 +211,22 @@ def render_bar_svg(labels: List[str], values: List[float], color: str = "#2f80ed
         top_percent = sum(values[index:]) / total * 100
         above_percent = sum(values[index + 1 :]) / total * 100
         band_percent = value / total * 100
+        common_attrs = (
+            f'data-dist-index="{index}" data-label="{label}" data-count="{int(value)}" '
+            f'data-top-percent="{top_percent:.2f}" data-above-percent="{above_percent:.2f}" '
+            f'data-band-percent="{band_percent:.2f}"'
+        )
+        bars.append(
+            f'<rect class="dist-hit-area" tabindex="0" role="button" '
+            f'aria-label="{label}点のクリック領域。クリックすると上位割合を表示します" '
+            f'{common_attrs} '
+            f'x="{x:.2f}" y="{top:.2f}" width="{bar_width:.2f}" height="{chart_height:.2f}" fill="{color}">'
+            f"<title>{label}: {value}</title></rect>"
+        )
         bars.append(
             f'<rect class="dist-bar" tabindex="0" role="button" '
             f'aria-label="{label}点。クリックすると上位割合を表示します" '
-            f'data-label="{label}" data-count="{int(value)}" '
-            f'data-top-percent="{top_percent:.2f}" data-above-percent="{above_percent:.2f}" '
-            f'data-band-percent="{band_percent:.2f}" '
+            f'{common_attrs} '
             f'x="{x:.2f}" y="{y:.2f}" width="{bar_width:.2f}" height="{bar_height:.2f}" fill="{color}">'
             f"<title>{label}: {value}</title></rect>"
         )
@@ -345,7 +355,14 @@ def render_ranking_html(summary: dict, rows: List[dict]) -> str:
 (function () {{
   var note = document.querySelector('[data-percentile-note]');
   var bars = document.querySelectorAll('.dist-bar');
-  function showNote(bar) {{
+  var clickTargets = document.querySelectorAll('.dist-bar, .dist-hit-area');
+  function showNote(target) {{
+    var bar = target.classList.contains('dist-bar')
+      ? target
+      : document.querySelector('.dist-bar[data-dist-index="' + target.dataset.distIndex + '"]');
+    if (!bar) {{
+      return;
+    }}
     bars.forEach(function (item) {{ item.classList.remove('is-selected'); }});
     bar.classList.add('is-selected');
     note.hidden = false;
@@ -356,12 +373,12 @@ def render_ranking_html(summary: dict, rows: List[dict]) -> str:
       '人 / この帯のみ: ' + bar.dataset.bandPercent + '% / この帯より上: ' +
       bar.dataset.abovePercent + '%</span>';
   }}
-  bars.forEach(function (bar) {{
-    bar.addEventListener('click', function () {{ showNote(bar); }});
-    bar.addEventListener('keydown', function (event) {{
+  clickTargets.forEach(function (target) {{
+    target.addEventListener('click', function () {{ showNote(target); }});
+    target.addEventListener('keydown', function (event) {{
       if (event.key === 'Enter' || event.key === ' ') {{
         event.preventDefault();
-        showNote(bar);
+        showNote(target);
       }}
     }});
   }});
@@ -473,8 +490,11 @@ h2 { margin: 0 0 16px; font-size: 18px; }
 .panel { padding: 18px; margin-bottom: 16px; }
 .chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
 .chart-svg text { fill: var(--muted); font-size: 12px; }
-.dist-bar { cursor: pointer; transition: opacity 120ms ease, filter 120ms ease; }
+.dist-hit-area { cursor: pointer; opacity: 0.055; transition: opacity 120ms ease; }
+.dist-hit-area:hover, .dist-hit-area:focus { opacity: 0.1; outline: none; }
+.dist-hit-area:hover + .dist-bar, .dist-hit-area:focus + .dist-bar,
 .dist-bar:hover, .dist-bar:focus { opacity: 0.82; outline: none; filter: brightness(0.92); }
+.dist-bar { cursor: pointer; transition: opacity 120ms ease, filter 120ms ease; }
 .dist-bar.is-selected { stroke: #172033; stroke-width: 3; filter: brightness(0.88); }
 .percentile-note {
   margin-top: 14px;
