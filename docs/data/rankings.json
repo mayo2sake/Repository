@@ -5,8 +5,7 @@
     "source_url": "https://www.e-typing.ne.jp/ranking/index.asp?sc=trysc&no=1313",
     "row_count": 5110,
     "page_count": 171,
-    "generated_at": "2026-06-29T03:57:50.334016+00:00",
-    "excel": "files/e_typing_trysc_1313.xlsx",
+    "generated_at": "2026-06-29T13:37:57.901450+00:00",
     "stats": {
       "participant_count": 5110,
       "average": 237.5183953033268,
@@ -16,6 +15,25 @@
       "hensachi_80": 571.1271786709627,
       "hensachi_90": 682.3301064601746,
       "max_score": 927,
+      "min_score": 0
+    }
+  },
+  {
+    "no": "1312",
+    "title": "第1312回 腕試しタイピング　2026/6/9～2026/6/16",
+    "source_url": "https://www.e-typing.ne.jp/ranking/index.asp?sc=trysc&no=1312",
+    "row_count": 5329,
+    "page_count": 178,
+    "generated_at": "2026-06-29T13:38:36.027941+00:00",
+    "stats": {
+      "participant_count": 5329,
+      "average": 237.38299868643273,
+      "stddev": 109.77967092914524,
+      "hensachi_60": 347.16266961557795,
+      "hensachi_70": 456.9423405447232,
+      "hensachi_80": 566.7220114738684,
+      "hensachi_90": 676.5016824030137,
+      "max_score": 922,
       "min_score": 0
     }
   }
