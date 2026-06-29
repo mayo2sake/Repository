@@ -66,6 +66,19 @@ h2 { margin: 0 0 16px; font-size: 18px; }
 .panel { padding: 18px; margin-bottom: 16px; }
 .chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
 .chart-svg text { fill: var(--muted); font-size: 12px; }
+.dist-bar { cursor: pointer; transition: opacity 120ms ease, filter 120ms ease; }
+.dist-bar:hover, .dist-bar:focus { opacity: 0.82; outline: none; filter: brightness(0.92); }
+.dist-bar.is-selected { stroke: #172033; stroke-width: 3; filter: brightness(0.88); }
+.percentile-note {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #b8d4ff;
+  border-radius: 8px;
+  background: #eef6ff;
+  color: var(--text);
+  line-height: 1.65;
+}
+.percentile-note span { display: block; color: var(--muted); font-size: 13px; }
 .axis { stroke: var(--line); stroke-width: 1; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; }
