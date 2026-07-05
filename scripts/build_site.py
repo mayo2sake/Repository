@@ -265,22 +265,27 @@ def render_horizontal_bar_svg(labels: List[str], values: List[float], color: str
 
 def render_line_svg(manifest: List[dict]) -> str:
     width, height = 860, 360
-    left, right, top, bottom = 52, 28, 28, 56
+    left, right, top, bottom = 64, 64, 28, 56
     chart_width = width - left - right
     chart_height = height - top - bottom
     ordered = list(reversed(manifest))
     if not ordered:
         return '<div class="empty">データがありません</div>'
-    values_a = [item["stats"]["average"] for item in ordered]
-    values_b = [item["stats"]["hensachi_70"] for item in ordered]
-    all_values = values_a + values_b
-    min_value = min(all_values)
-    max_value = max(all_values)
-    if min_value == max_value:
-        min_value -= 1
-        max_value += 1
+    average_values = [item["stats"]["average"] for item in ordered]
+    participant_values = [item["stats"]["participant_count"] for item in ordered]
 
-    def points(values: List[float]) -> str:
+    def value_range(values: List[float]) -> Tuple[float, float]:
+        min_value = min(values)
+        max_value = max(values)
+        if min_value == max_value:
+            min_value -= 1
+            max_value += 1
+        return min_value, max_value
+
+    average_min, average_max = value_range(average_values)
+    participant_min, participant_max = value_range(participant_values)
+
+    def points(values: List[float], min_value: float, max_value: float) -> str:
         coords = []
         denom = max(len(values) - 1, 1)
         for index, value in enumerate(values):
@@ -299,12 +304,15 @@ def render_line_svg(manifest: List[dict]) -> str:
 <svg class="chart-svg" viewBox="0 0 {width} {height}" role="img">
   <line x1="{left}" y1="{top + chart_height}" x2="{width - right}" y2="{top + chart_height}" class="axis"/>
   <line x1="{left}" y1="{top}" x2="{left}" y2="{top + chart_height}" class="axis"/>
-  <text x="{left - 8}" y="{top + 12}" text-anchor="end">{max_value:.0f}</text>
-  <text x="{left - 8}" y="{top + chart_height}" text-anchor="end">{min_value:.0f}</text>
-  <polyline points="{points(values_a)}" fill="none" stroke="#2f80ed" stroke-width="3"/>
-  <polyline points="{points(values_b)}" fill="none" stroke="#dc2626" stroke-width="3"/>
-  <circle cx="{left}" cy="14" r="5" fill="#2f80ed"/><text x="{left + 10}" y="18">平均</text>
-  <circle cx="{left + 72}" cy="14" r="5" fill="#dc2626"/><text x="{left + 82}" y="18">偏差値70</text>
+  <line x1="{width - right}" y1="{top}" x2="{width - right}" y2="{top + chart_height}" class="axis"/>
+  <text x="{left - 8}" y="{top + 12}" text-anchor="end">{average_max:.0f}</text>
+  <text x="{left - 8}" y="{top + chart_height}" text-anchor="end">{average_min:.0f}</text>
+  <text x="{width - right + 8}" y="{top + 12}">{participant_max:,.0f}</text>
+  <text x="{width - right + 8}" y="{top + chart_height}">{participant_min:,.0f}</text>
+  <polyline points="{points(average_values, average_min, average_max)}" fill="none" stroke="#2f80ed" stroke-width="3"/>
+  <polyline points="{points(participant_values, participant_min, participant_max)}" fill="none" stroke="#16a34a" stroke-width="3"/>
+  <circle cx="{left}" cy="14" r="5" fill="#2f80ed"/><text x="{left + 10}" y="18">平均スコア</text>
+  <circle cx="{left + 112}" cy="14" r="5" fill="#16a34a"/><text x="{left + 122}" y="18">参加人数</text>
   {''.join(labels)}
 </svg>
 """
@@ -407,7 +415,7 @@ def render_index_html(manifest: List[dict]) -> str:
     body = f"""
 {latest_block}
 <section class="panel">
-  <h2>平均スコアの推移</h2>
+  <h2>これまでの推移</h2>
   {render_line_svg(manifest)}
 </section>
 <section class="panel">

@@ -1,6 +1,12 @@
 name: Update ranking site
 
 on:
+  push:
+    paths:
+      - ".github/workflows/update-ranking-site.yml"
+      - "docs/**"
+      - "requirements.txt"
+      - "scripts/**"
   workflow_dispatch:
   schedule:
     # e-typing ranking periods appear to roll over on Tuesday.
