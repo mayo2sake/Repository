@@ -33,10 +33,15 @@
 </section>
 <section class="panel">
   <h2>上位一覧</h2>
+  <div class="search-row">
+    <label for="user-search">ユーザー名検索</label>
+    <input id="user-search" type="search" autocomplete="off" placeholder="ユーザー名を入力" data-user-search>
+  </div>
+  <p class="result-summary" data-result-summary>上位20件を表示しています。</p>
   <table>
-    <thead><tr><th>順位</th><th>ユーザー名</th><th>スコア</th></tr></thead>
-    <tbody>
-      <tr><td>1位</td><td>豊か 油単 湯湯婆 (＞∀＜)</td><td>922</td></tr><tr><td>2位</td><td>RFEito@xan</td><td>806</td></tr><tr><td>3位</td><td>Y-i@xan</td><td>782</td></tr><tr><td>4位</td><td>RFKGGAMES</td><td>766</td></tr><tr><td>5位</td><td>えっっ、</td><td>759</td></tr><tr><td>6位</td><td>Aeyt_Typing</td><td>744</td></tr><tr><td>7位</td><td>/ Azrayt /</td><td>733</td></tr><tr><td>8位</td><td>おわたんばりんｽﾞﾄﾞﾝ</td><td>727</td></tr><tr><td>9位</td><td>こお</td><td>726</td></tr><tr><td>10位</td><td>BrustBlitz</td><td>723</td></tr><tr><td>11位</td><td>wonder</td><td>707</td></tr><tr><td>12位</td><td>セレナーデ☆ゆうき</td><td>696</td></tr><tr><td>12位</td><td>スピードアキュレイト@ぁ〜ん</td><td>696</td></tr><tr><td>14位</td><td>かにかに@xan</td><td>692</td></tr><tr><td>15位</td><td>つべ@ぁ～ん</td><td>687</td></tr><tr><td>16位</td><td>uaaaaaaaa</td><td>686</td></tr><tr><td>17位</td><td>RF ぼくちゃろ@ζyper</td><td>681</td></tr><tr><td>18位</td><td>クスノキ</td><td>679</td></tr><tr><td>18位</td><td>unused_HAL＠ぁ～ん</td><td>679</td></tr><tr><td>18位</td><td>Asemnal</td><td>679</td></tr>
+    <thead><tr><th>順位</th><th>ユーザー名</th><th>スコア</th><th>偏差値</th></tr></thead>
+    <tbody data-results-body>
+      <tr><td>1位</td><td>豊か 油単 湯湯婆 (＞∀＜)</td><td>922</td><td>112.36</td></tr><tr><td>2位</td><td>RFEito@xan</td><td>806</td><td>101.80</td></tr><tr><td>3位</td><td>Y-i@xan</td><td>782</td><td>99.61</td></tr><tr><td>4位</td><td>RFKGGAMES</td><td>766</td><td>98.15</td></tr><tr><td>5位</td><td>えっっ、</td><td>759</td><td>97.51</td></tr><tr><td>6位</td><td>Aeyt_Typing</td><td>744</td><td>96.15</td></tr><tr><td>7位</td><td>/ Azrayt /</td><td>733</td><td>95.15</td></tr><tr><td>8位</td><td>おわたんばりんｽﾞﾄﾞﾝ</td><td>727</td><td>94.60</td></tr><tr><td>9位</td><td>こお</td><td>726</td><td>94.51</td></tr><tr><td>10位</td><td>BrustBlitz</td><td>723</td><td>94.24</td></tr><tr><td>11位</td><td>wonder</td><td>707</td><td>92.78</td></tr><tr><td>12位</td><td>セレナーデ☆ゆうき</td><td>696</td><td>91.78</td></tr><tr><td>12位</td><td>スピードアキュレイト@ぁ〜ん</td><td>696</td><td>91.78</td></tr><tr><td>14位</td><td>かにかに@xan</td><td>692</td><td>91.41</td></tr><tr><td>15位</td><td>つべ@ぁ～ん</td><td>687</td><td>90.96</td></tr><tr><td>16位</td><td>uaaaaaaaa</td><td>686</td><td>90.87</td></tr><tr><td>17位</td><td>RF ぼくちゃろ@ζyper</td><td>681</td><td>90.41</td></tr><tr><td>18位</td><td>クスノキ</td><td>679</td><td>90.23</td></tr><tr><td>18位</td><td>unused_HAL＠ぁ～ん</td><td>679</td><td>90.23</td></tr><tr><td>18位</td><td>Asemnal</td><td>679</td><td>90.23</td></tr>
     </tbody>
   </table>
 </section>
@@ -71,6 +76,88 @@
       }
     });
   });
+}());
+(function () {
+  var input = document.querySelector('[data-user-search]');
+  var tbody = document.querySelector('[data-results-body]');
+  var summary = document.querySelector('[data-result-summary]');
+  var dataUrl = '../data/1312.json';
+  var average = 237.382998686433;
+  var stddev = 109.779670929145;
+  var allRows = null;
+  var topRows = [{"rank": 1, "rank_text": "1位", "user": "豊か 油単 湯湯婆 (＞∀＜)", "score": 922}, {"rank": 2, "rank_text": "2位", "user": "RFEito@xan", "score": 806}, {"rank": 3, "rank_text": "3位", "user": "Y-i@xan", "score": 782}, {"rank": 4, "rank_text": "4位", "user": "RFKGGAMES", "score": 766}, {"rank": 5, "rank_text": "5位", "user": "えっっ、", "score": 759}, {"rank": 6, "rank_text": "6位", "user": "Aeyt_Typing", "score": 744}, {"rank": 7, "rank_text": "7位", "user": "/ Azrayt /", "score": 733}, {"rank": 8, "rank_text": "8位", "user": "おわたんばりんｽﾞﾄﾞﾝ", "score": 727}, {"rank": 9, "rank_text": "9位", "user": "こお", "score": 726}, {"rank": 10, "rank_text": "10位", "user": "BrustBlitz", "score": 723}, {"rank": 11, "rank_text": "11位", "user": "wonder", "score": 707}, {"rank": 12, "rank_text": "12位", "user": "セレナーデ☆ゆうき", "score": 696}, {"rank": 12, "rank_text": "12位", "user": "スピードアキュレイト@ぁ〜ん", "score": 696}, {"rank": 14, "rank_text": "14位", "user": "かにかに@xan", "score": 692}, {"rank": 15, "rank_text": "15位", "user": "つべ@ぁ～ん", "score": 687}, {"rank": 16, "rank_text": "16位", "user": "uaaaaaaaa", "score": 686}, {"rank": 17, "rank_text": "17位", "user": "RF ぼくちゃろ@ζyper", "score": 681}, {"rank": 18, "rank_text": "18位", "user": "クスノキ", "score": 679}, {"rank": 18, "rank_text": "18位", "user": "unused_HAL＠ぁ～ん", "score": 679}, {"rank": 18, "rank_text": "18位", "user": "Asemnal", "score": 679}];
+
+  function hensachi(score) {
+    if (stddev === 0) {
+      return 50;
+    }
+    return 50 + ((score - average) / stddev) * 10;
+  }
+
+  function renderRows(rows, emptyText) {
+    tbody.textContent = '';
+    if (!rows.length) {
+      var emptyRow = document.createElement('tr');
+      var emptyCell = document.createElement('td');
+      emptyCell.colSpan = 4;
+      emptyCell.textContent = emptyText;
+      emptyRow.appendChild(emptyCell);
+      tbody.appendChild(emptyRow);
+      return;
+    }
+    rows.forEach(function (row) {
+      var tr = document.createElement('tr');
+      [row.rank_text, row.user, row.score, hensachi(Number(row.score)).toFixed(2)].forEach(function (value) {
+        var td = document.createElement('td');
+        td.textContent = value;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  function ensureRows() {
+    if (allRows) {
+      return Promise.resolve(allRows);
+    }
+    return fetch(dataUrl)
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error('failed to load ranking data');
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        allRows = data.rows || [];
+        return allRows;
+      });
+  }
+
+  function updateResults() {
+    var query = input.value.trim().toLowerCase();
+    if (!query) {
+      renderRows(topRows, '表示できる結果がありません。');
+      summary.textContent = '上位20件を表示しています。';
+      return;
+    }
+    summary.textContent = '検索しています。';
+    ensureRows()
+      .then(function (rows) {
+        if (input.value.trim().toLowerCase() !== query) {
+          return;
+        }
+        var matched = rows.filter(function (row) {
+          return String(row.user || '').toLowerCase().indexOf(query) !== -1;
+        });
+        renderRows(matched, '該当するユーザーは見つかりませんでした。');
+        summary.textContent = matched.length.toLocaleString('ja-JP') + '件見つかりました。';
+      })
+      .catch(function () {
+        summary.textContent = '検索データを読み込めませんでした。時間をおいて再度お試しください。';
+      });
+  }
+
+  input.addEventListener('input', updateResults);
 }());
 </script>
 

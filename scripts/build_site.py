@@ -141,6 +141,12 @@ def build_stats(rows: List[dict]) -> Dict[str, float]:
     }
 
 
+def calc_hensachi(score: float, average: float, stddev: float) -> float:
+    if stddev == 0:
+        return 50.0
+    return 50 + ((score - average) / stddev) * 10
+
+
 def build_distribution(rows: List[dict], width: int = 50) -> List[dict]:
     scores = [row["score"] for row in rows]
     if not scores:
@@ -337,6 +343,18 @@ def render_ranking_html(summary: dict, rows: List[dict]) -> str:
     distribution = build_distribution(rows)
     top_rows = rows[:20]
     distribution_svg = render_bar_svg([item["label"] for item in distribution], [item["count"] for item in distribution])
+    average = stats["average"]
+    stddev = stats["stddev"]
+    top_rows_html = "".join(
+        "<tr>"
+        f"<td>{row['rank_text']}</td>"
+        f"<td>{escape(str(row['user']))}</td>"
+        f"<td>{row['score']}</td>"
+        f"<td>{calc_hensachi(row['score'], average, stddev):.2f}</td>"
+        "</tr>"
+        for row in top_rows
+    )
+    top_rows_json = json.dumps(top_rows, ensure_ascii=False).replace("</", "<\\/")
     body = f"""
 <section class="hero">
   <p class="eyebrow">第{escape(summary['no'])}回</p>
@@ -352,10 +370,15 @@ def render_ranking_html(summary: dict, rows: List[dict]) -> str:
 </section>
 <section class="panel">
   <h2>上位一覧</h2>
+  <div class="search-row">
+    <label for="user-search">ユーザー名検索</label>
+    <input id="user-search" type="search" autocomplete="off" placeholder="ユーザー名を入力" data-user-search>
+  </div>
+  <p class="result-summary" data-result-summary>上位20件を表示しています。</p>
   <table>
-    <thead><tr><th>順位</th><th>ユーザー名</th><th>スコア</th></tr></thead>
-    <tbody>
-      {''.join(f"<tr><td>{row['rank_text']}</td><td>{escape(str(row['user']))}</td><td>{row['score']}</td></tr>" for row in top_rows)}
+    <thead><tr><th>順位</th><th>ユーザー名</th><th>スコア</th><th>偏差値</th></tr></thead>
+    <tbody data-results-body>
+      {top_rows_html}
     </tbody>
   </table>
 </section>
@@ -390,6 +413,88 @@ def render_ranking_html(summary: dict, rows: List[dict]) -> str:
       }}
     }});
   }});
+}}());
+(function () {{
+  var input = document.querySelector('[data-user-search]');
+  var tbody = document.querySelector('[data-results-body]');
+  var summary = document.querySelector('[data-result-summary]');
+  var dataUrl = '../data/{escape(summary['no'])}.json';
+  var average = {average:.12f};
+  var stddev = {stddev:.12f};
+  var allRows = null;
+  var topRows = {top_rows_json};
+
+  function hensachi(score) {{
+    if (stddev === 0) {{
+      return 50;
+    }}
+    return 50 + ((score - average) / stddev) * 10;
+  }}
+
+  function renderRows(rows, emptyText) {{
+    tbody.textContent = '';
+    if (!rows.length) {{
+      var emptyRow = document.createElement('tr');
+      var emptyCell = document.createElement('td');
+      emptyCell.colSpan = 4;
+      emptyCell.textContent = emptyText;
+      emptyRow.appendChild(emptyCell);
+      tbody.appendChild(emptyRow);
+      return;
+    }}
+    rows.forEach(function (row) {{
+      var tr = document.createElement('tr');
+      [row.rank_text, row.user, row.score, hensachi(Number(row.score)).toFixed(2)].forEach(function (value) {{
+        var td = document.createElement('td');
+        td.textContent = value;
+        tr.appendChild(td);
+      }});
+      tbody.appendChild(tr);
+    }});
+  }}
+
+  function ensureRows() {{
+    if (allRows) {{
+      return Promise.resolve(allRows);
+    }}
+    return fetch(dataUrl)
+      .then(function (response) {{
+        if (!response.ok) {{
+          throw new Error('failed to load ranking data');
+        }}
+        return response.json();
+      }})
+      .then(function (data) {{
+        allRows = data.rows || [];
+        return allRows;
+      }});
+  }}
+
+  function updateResults() {{
+    var query = input.value.trim().toLowerCase();
+    if (!query) {{
+      renderRows(topRows, '表示できる結果がありません。');
+      summary.textContent = '上位20件を表示しています。';
+      return;
+    }}
+    summary.textContent = '検索しています。';
+    ensureRows()
+      .then(function (rows) {{
+        if (input.value.trim().toLowerCase() !== query) {{
+          return;
+        }}
+        var matched = rows.filter(function (row) {{
+          return String(row.user || '').toLowerCase().indexOf(query) !== -1;
+        }});
+        renderRows(matched, '該当するユーザーは見つかりませんでした。');
+        summary.textContent = matched.length.toLocaleString('ja-JP') + '件見つかりました。';
+      }})
+      .catch(function () {{
+        summary.textContent = '検索データを読み込めませんでした。時間をおいて再度お試しください。';
+      }});
+  }}
+
+  input.addEventListener('input', updateResults);
 }}());
 </script>
 """
@@ -515,6 +620,22 @@ h2 { margin: 0 0 16px; font-size: 18px; }
 }
 .percentile-note span { display: block; color: var(--muted); font-size: 13px; }
 .axis { stroke: var(--line); stroke-width: 1; }
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.search-row label { color: var(--muted); font-size: 13px; font-weight: 700; }
+.search-row input {
+  width: min(360px, 100%);
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 12px;
+  font: inherit;
+}
+.result-summary { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; }
 th { color: var(--muted); font-size: 13px; }
@@ -522,6 +643,7 @@ th { color: var(--muted); font-size: 13px; }
   .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stat-break { grid-column-start: auto; }
   .chart-grid { grid-template-columns: 1fr; }
+  .search-row { align-items: stretch; flex-direction: column; }
   .site-header { padding: 0 16px; }
 }
 """
