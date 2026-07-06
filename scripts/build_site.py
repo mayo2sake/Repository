@@ -330,10 +330,6 @@ def stat_cards(stats: dict) -> str:
         ("平均", f"{stats['average']:.2f}", ""),
         ("標準偏差", f"{stats['stddev']:.2f}", ""),
         ("最高スコア", f"{stats['max_score']:,}", ""),
-        ("偏差値60", f"{stats['hensachi_60']:.2f}", " stat-break"),
-        ("偏差値70", f"{stats['hensachi_70']:.2f}", ""),
-        ("偏差値80", f"{stats['hensachi_80']:.2f}", ""),
-        ("偏差値90", f"{stats['hensachi_90']:.2f}", ""),
     ]
     return "\n".join(f"<div class=\"stat{class_name}\"><span>{label}</span><strong>{value}</strong></div>" for label, value, class_name in items)
 
