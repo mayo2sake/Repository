@@ -1,5 +1,24 @@
 [
   {
+    "no": "1317",
+    "title": "第1317回 腕試しタイピング　2026/7/14～2026/7/21",
+    "source_url": "https://www.e-typing.ne.jp/ranking/index.asp?sc=trysc&no=1317",
+    "row_count": 3916,
+    "page_count": 131,
+    "generated_at": "2026-07-21T04:50:15.845148+00:00",
+    "stats": {
+      "participant_count": 3916,
+      "average": 242.51327885597547,
+      "stddev": 107.85388139395583,
+      "hensachi_60": 350.3671602499313,
+      "hensachi_70": 458.22104164388713,
+      "hensachi_80": 566.074923037843,
+      "hensachi_90": 673.9288044317988,
+      "max_score": 939,
+      "min_score": 0
+    }
+  },
+  {
     "no": "1316",
     "title": "第1316回 腕試しタイピング　2026/7/7～2026/7/14",
     "source_url": "https://www.e-typing.ne.jp/ranking/index.asp?sc=trysc&no=1316",
